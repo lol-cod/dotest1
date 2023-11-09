@@ -1,0 +1,167 @@
+/* FinancePage.css */
+
+.finance-page-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+.order-list {
+  width: 100%;
+  overflow-x: auto; /* Enable horizontal scrolling for small screens */
+  border-collapse: collapse;
+  margin-top: 20px;
+}
+
+.order-list th,
+.order-list td {
+  padding: 10px;
+  border: 1px solid #ccc;
+  text-align: left;
+}
+
+.order-list thead {
+  background-color: #007bff;
+  color: #fff;
+}
+
+.order-list th {
+  font-weight: bold;
+}
+
+.order-list tr:hover {
+  background-color: #f7f7f7;
+}
+
+/* Add a class for selected orders */
+.selected-order-row {
+  font-size: larger;
+  font-weight: bold; /* You can adjust this color to your preference */
+}
+
+.selected-order {
+  margin-top: 20px;
+  padding: 20px;
+  border: 1px solid #ccc;
+  background-color: #f7f7f7;
+  border-radius: 5px;
+}
+
+.selected-order h2 {
+  font-size: 20px;
+  margin-bottom: 10px;
+}
+
+.selected-order-fields {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+}
+
+/* Style for each column */
+.selected-order-column {
+  width: 48%;
+  margin-top: 20px;
+  padding: 10px;
+  
+  border: 1px solid #ccc;
+  border-radius: 5px;
+
+  background-color: lightblue;
+   /* Adjust the width to fit two fields per column with some spacing */
+}
+
+.selected-order-fields p {
+  margin-bottom: 10px;
+}
+
+/* CSS for the filter button container */
+.filter-container {
+  display: flex;
+  justify-content: space-between; /* Adjust alignment as needed */
+  background-color: #f2f2f2; /* Background color for the container */
+  padding: 10px; /* Add padding to create some spacing around the buttons */
+  border-radius: 5px; /* Rounded corners for the container */
+  margin-bottom: 20px; /* Add margin to separate it from other content */
+}
+
+/* Styles for individual filter buttons (adjust as needed) */
+.filter-button {
+  background-color: #3498db; /* Button background color */
+  color: #fff; /* Button text color */
+  padding: 10px 15px; /* Padding for the button */
+  border: none; /* Remove button border */
+  border-radius: 3px; /* Rounded corners for the button */
+  cursor: pointer; /* Show pointer cursor on hover */
+  margin-right: 10px; /* Add margin to separate buttons */
+  /* Additional styles like font size, font family, etc. */
+}
+
+/* Style the last button to remove right margin */
+.filter-button:last-child {
+  margin-right: 0;
+}
+
+
+input[type="text"] {
+  width: 80%;
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+input[type="text"]:focus {
+  border: 1px solid #007bff;
+}
+
+.payment-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+button {
+  padding: 10px 20px;
+  background-color: #007bff;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #0056b3;
+}
+
+.confirmed-payment-button-container {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 20px;
+}
+
+.confirm-button,
+.reject-button {
+  padding: 10px 20px;
+  background-color: #00b894; /* Green color for Confirm button */
+  border: none;
+  border-radius: 5px;
+  color: #fff;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.confirm-button:hover {
+  background-color: #00a384; /* Darker green color on hover */
+}
+
+.reject-button {
+  background-color: #d63031; /* Red color for Reject button */
+}
+
+.reject-button:hover {
+  background-color: #c82e2c; /* Darker red color on hover */
+}
+
+

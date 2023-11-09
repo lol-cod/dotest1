@@ -1,0 +1,550 @@
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import './salespage.css';
+import axios from 'axios';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+import { useLocation } from 'react-router-dom';
+import { CountryDropdown } from 'react-country-region-selector';
+import Sidebar from './sidebar_sales';
+
+function SalesPage() {
+  const [country, setCountry] = useState('');
+  const [userOrdersData, setUserOrdersData] = useState([]);
+  const [isUserOrdersPopupVisible, setUserOrdersPopupVisibility] = useState(false);
+  const location = useLocation();
+  const { userId } = location.state;
+  const POC=userId;
+  const [formData, setFormData] = useState({
+    month: '',
+    orderDate: '',
+    orderNo: '',
+    POC: userId,
+    oldNewClient: 'Existing',
+    orderType: '',
+    clientName: '',
+    countryRegion: '',
+    contactNumber: '',
+    currencyOfPayment: '',
+    quotation: '',
+    totalAmountPaid: '',
+    shippingCosts: '',
+    totalAmount: '',
+    paymentSenderName: '',
+    modeOfPayment: '',
+    shippingAddress: '',
+    shippingService: '',
+  });
+
+  const paymentOptions = [
+    'MEDICARE UBI',
+    'MEDISELLERKOTAK',
+    'MEDICARE KOTAK',
+    'MEDISELLER UBI',
+    'MEDISELLER IDFC',
+    'MANISHA GUPTA UBI',
+    'SANDEEP GUPTA UBI',
+    '%%%',
+    '$$$',
+    'UK BANK ACCOUNT',
+    'WESTERN UNION',
+    'IN PERSON',
+    'UPI AND OTHER',
+  ];
+
+  const [isConfirmationModalVisible, setConfirmationModalVisibility] = useState(false);
+  const navigate = useNavigate();
+
+  const handleFetchUserOrders = () => {
+    axios.get('/api/sales/userOrders', { params: { userId } })
+    .then((response) => {
+      setUserOrdersData(response.data);
+      showUserOrdersPopup();
+    })
+    .catch((error) => {
+      // Handle any errors
+    });
+  }
+  
+  
+  
+
+  useEffect(() => {
+    const currentDate = new Date();
+    const options = { month: 'long' };
+    const currentMonth = currentDate.toLocaleString('en-US', options);
+    const currentMonthnum = (currentDate.getMonth() + 1).toString().padStart(2, '0');
+    const currentDay = currentDate.getDate().toString().padStart(2, '0');
+    const currentYear = currentDate.getFullYear();
+    const formattedDate = `${currentYear}-${currentMonthnum}-${currentDay}`;
+    setFormData({
+      ...formData,
+      month: currentMonth,
+      orderDate: formattedDate,
+    });
+  }, []);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    const totalAmountPaid = parseFloat(formData.totalAmountPaid) || 0;
+    const shippingCosts = parseFloat(formData.shippingCosts) || 0;
+    const updatedTotalAmount = (totalAmountPaid + shippingCosts).toFixed(2);
+    setFormData({
+      ...formData,
+      [name]: value,
+      totalAmount: updatedTotalAmount,
+    });
+  };
+
+  const showUserOrdersPopup = () => {
+    setUserOrdersPopupVisibility(true);
+  };
+
+  const showConfirmationModal = () => {
+    setConfirmationModalVisibility(true);
+  };
+
+  const hideConfirmationModal = () => {
+    setConfirmationModalVisibility(false);
+  };
+
+  const handleSubmit = () => {
+    const missingFields = [];
+
+    if (!formData.month) missingFields.push('Month');
+    if (!formData.orderDate) missingFields.push('Order Date');
+    if (!formData.orderNo) missingFields.push('Order No');
+    if (!formData.POC) missingFields.push('POC');
+    if (!formData.clientName) missingFields.push('Client Name');
+    if (!formData.orderType) missingFields.push('Order Type');
+    if (!country) missingFields.push('Country/Region');
+    if (!formData.contactNumber) missingFields.push('Contact Number');
+    if (!formData.currencyOfPayment) missingFields.push('Currency of Payment');
+    if (!formData.quotation) missingFields.push('Quotation');
+    if (!formData.totalAmountPaid) missingFields.push('Total Amount Paid (Excluding Shipping Costs)');
+    if (!formData.shippingCosts) missingFields.push('Shipping Costs');
+    if (!formData.totalAmount) missingFields.push('Total Amount');
+    if (!formData.paymentSenderName) missingFields.push('Payment Sender Name');
+    if (!formData.modeOfPayment) missingFields.push('Mode of Payment');
+    if (!formData.shippingAddress) missingFields.push('Shipping Address');
+    if (!formData.shippingService) missingFields.push('Shipping Service');
+
+    if (missingFields.length > 0) {
+      toast.error(`The following fields are missing: ${missingFields.join(', ')}`);
+    } else {
+      showConfirmationModal();
+    }
+  };
+
+  const confirmSubmit = () => {
+    axios.post('/api/sales', formData)
+      .then((response) => {
+        console.log('Form submitted successfully:', response.data);
+        toast.success('Form submitted successfully', {
+          autoClose: 3000,
+          position: toast.POSITION.TOP_RIGHT,
+        });
+        setFormData({
+          month: '',
+          orderDate: '',
+          orderNo: '',
+          POC: userId,
+          oldNewClient: 'Existing',
+          orderType: '',
+          clientName: '',
+          countryRegion: '',
+          contactNumber: '',
+          currencyOfPayment: '',
+          quotation: '',
+          totalAmountPaid: '',
+          shippingCosts: '',
+          totalAmount: '',
+          paymentSenderName: '',
+          modeOfPayment: '',
+          shippingAddress: '',
+          shippingService: '',
+        });
+        hideConfirmationModal();
+      })
+      .catch((error) => {
+        console.error('Error submitting form:', error);
+      });
+  };
+
+  const cancelSubmit = () => {
+    hideConfirmationModal();
+  };
+
+return (
+    <div className="sales-page-container bg-gray-100 p-6">
+      <h1 className="text-2xl font-bold mb-4">Add Sales Information</h1>
+      <div className="icon-container bg-white p-4 shadow-md rounded-lg">
+        <Sidebar onFetchUserOrders={handleFetchUserOrders} />
+      </div>
+
+      <form onSubmit={handleSubmit}>
+        <div className="form-group mb-4">
+          <label htmlFor="month">Month:</label>
+          <input
+            type="text"
+            id="month"
+            name="month"
+            value={formData.month}
+            onChange={handleChange}
+            readOnly
+            required
+            className="w-full bg-gray-200 p-2 rounded"
+          />
+        </div>
+
+        <div className="form-group mb-4">
+          <label htmlFor="orderDate">Order Date:</label>
+          <input
+            type="date"
+            id="orderDate"
+            name="orderDate"
+            value={formData.orderDate}
+            onChange={handleChange}
+            readOnly
+            required
+            className="w-full bg-gray-200 p-2 rounded"
+          />
+        </div>
+
+        <div className="form-group mb-4">
+          <label htmlFor="orderNo">Order No:</label>
+          <input
+            type="text"
+            id="orderNo"
+            name="orderNo"
+            value={formData.orderNo}
+            onChange={handleChange}
+            required
+            className="w-full bg-gray-200 p-2 rounded"
+          />
+        </div>
+
+        <div className="form-group mb-4">
+          <label htmlFor="POC">POC:</label>
+          <input
+            type="text"
+            id="POC"
+            name="POC"
+            value={formData.POC}
+            onChange={handleChange}
+            readOnly
+            required
+            className="w-full bg-gray-200 p-2 rounded"
+          />
+        </div>
+
+        <div className="form-group mb-4">
+          <label htmlFor="oldNewClient">Existing / New Client:</label>
+          <select
+            id="oldNewClient"
+            name="oldNewClient"
+            value={formData.oldNewClient}
+            onChange={handleChange}
+            required
+            className="w-full bg-gray-200 p-2 rounded"
+          >
+            <option value="Existing">Existing</option>
+            <option value="New">New</option>
+          </select>
+        </div>
+
+        <div className="form-group mb-4">
+          <label htmlFor="orderType">Order Type:</label>
+          <select
+            id="orderType"
+            name="orderType"
+            value={formData.orderType}
+            onChange={handleChange}
+            required
+            className="w-full bg-gray-200 p-2 rounded"
+          >
+            <option value="">Select</option>
+            <option value="C2C">C2C</option>
+            <option value="NORMAL">NORMAL</option>
+          </select>
+        </div>
+
+        <div className="form-group mb-4">
+          <label htmlFor="clientName">Client Name:</label>
+          <input
+            type="text"
+            id="clientName"
+            name="clientName"
+            value={formData.clientName}
+            onChange={handleChange}
+            required
+            className="w-full bg-gray-200 p-2 rounded"
+          />
+        </div>
+
+        <div className="form-group mb-4">
+          <label htmlFor="countryRegion">Country / Region:</label>
+          <CountryDropdown
+            name="countryRegion"
+            value={country}
+            onChange={(selectedCountry) => setCountry(selectedCountry)}
+            required
+            className="w-full bg-gray-200 p-2 rounded"
+          />
+        </div>
+
+        <div className="form-group mb-4">
+          <label htmlFor="contactNumber">Contact Number:</label>
+          <input
+            type="text"
+            id="contactNumber"
+            name="contactNumber"
+            value={formData.contactNumber}
+            onChange={handleChange}
+            required
+            className="w-full bg-gray-200 p-2 rounded"
+          />
+        </div>
+
+        <div className="form-group mb-4">
+          <label htmlFor="currencyOfPayment">Currency of Payment:</label>
+          <select
+            id="currencyOfPayment"
+            name="currencyOfPayment"
+            value={formData.currencyOfPayment}
+            onChange={handleChange}
+            required
+            className="w-full bg-gray-200 p-2 rounded"
+          >
+            <option value="USD">USD</option>
+            <option value="INR">INR</option>
+            <option value="GBP">GBP</option>
+            <option value="AUD">AUD</option>
+            <option value="EUR">EUR</option>
+            <option value="$$$">$$$</option>
+            <option value="%%%">%%%</option>
+            <option value="CAD">CAD</option>
+          </select>
+        </div>
+
+        <div className="form-group mb-4">
+          <label htmlFor="quotation">Quotation:</label>
+          <input
+            type="text"
+            id="quotation"
+            name="quotation"
+            value={formData.quotation}
+            onChange={handleChange}
+            required
+            className="w-full bg-gray-200 p-2 rounded"
+          />
+        </div>
+
+        <div className="form-group mb-4">
+          <label htmlFor="totalAmountPaid">Total Amount Paid (Excluding Shipping Costs):</label>
+          <input
+            type="text"
+            id="totalAmountPaid"
+            name="totalAmountPaid"
+            value={formData.totalAmountPaid}
+            onChange={handleChange}
+            required
+            className="w-full bg-gray-200 p-2 rounded"
+          />
+        </div>
+
+        <div className="form-group mb-4">
+          <label htmlFor="shippingCosts">Shipping Costs:</label>
+          <input
+            type="text"
+            id="shippingCosts"
+            name="shippingCosts"
+            value={formData.shippingCosts}
+            onChange={handleChange}
+            required
+            className="w-full bg-gray-200 p-2 rounded"
+          />
+        </div>
+
+        <div className="form-group mb-4">
+          <label htmlFor="totalAmount">Total Amount:</label>
+          <input
+            type="text"
+            id="totalAmount"
+            name="totalAmount"
+            value={formData.totalAmount}
+            onChange={handleChange}
+            required
+            className="w-full bg-gray-200 p-2 rounded"
+          />
+        </div>
+
+        <div className="form-group mb-4">
+          <label htmlFor="paymentSenderName">Payment Sender Name (as per Payment details):</label>
+          <input
+            type="text"
+            id="paymentSenderName"
+            name="paymentSenderName"
+            value={formData.paymentSenderName}
+            onChange={handleChange}
+            required
+            className="w-full bg-gray-200 p-2 rounded"
+          />
+        </div>
+
+        <div className="form-group mb-4">
+          <label htmlFor="modeOfPayment">Mode of Payment:</label>
+          <select
+            id="modeOfPayment"
+            name="modeOfPayment"
+            value={formData.modeOfPayment}
+            onChange={handleChange}
+            required
+            className="w-full bg-gray-200 p-2 rounded"
+          >
+            {paymentOptions.map((option) => (
+              <option key={option} value={option}>
+                {option}
+              </option>
+            ))}
+          </select>
+        </div>
+
+        <div className="form-group mb-4">
+          <label htmlFor="shippingAddress">Shipping Address (Name: Address: Country: Pincode):</label>
+          <input
+            type="text"
+            id="shippingAddress"
+            name="shippingAddress"
+            value={formData.shippingAddress}
+            onChange={handleChange}
+            required
+            className="w-full bg-gray-200 p-2 rounded"
+          />
+        </div>
+
+        <div className="form-group mb-4">
+          <label htmlFor="shippingService">Shipping Service to be used:</label>
+          <input
+            type="text"
+            id="shippingService"
+            name="shippingService"
+            value={formData.shippingService}
+            onChange={handleChange}
+            required
+            className="w-full bg-gray-200 p-2 rounded"
+          />
+        </div>
+
+        <button
+          type="button"
+          onClick={handleSubmit}
+          className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded"
+        >
+          Submit
+        </button>
+      </form>
+
+      {isConfirmationModalVisible && (
+        <div className="popup fixed inset-0 flex items-center justify-center z-10 bg-opacity-50 bg-black">
+          <div className="confirmation-modal bg-white p-4 shadow-md rounded-lg">
+            <h2 className="text-2xl font-bold mb-4">Confirm Submission</h2>
+            <p>Data to be submitted:</p>
+            <p>Customer Name: {formData.clientName}</p>
+            <p>Order Number: {formData.orderNo}</p>
+            <p>Total Amount: {formData.totalAmount}</p>
+            <p>Quotation: {formData.quotation}</p>
+            <p>Shipping Address: {formData.shippingAddress}</p>
+            <button
+              onClick={confirmSubmit}
+              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 rounded mr-2"
+            >
+              Confirm
+            </button>
+            <button
+              onClick={cancelSubmit}
+              className="bg-red-500 hover:bg-red-600 text-white font-semibold py-2 px-4 rounded"
+            >
+              Cancel
+            </button>
+          </div>
+        </div>
+      }
+
+      {isUserOrdersPopupVisible && (
+        <div className="popup fixed inset-0 flex items-center justify-center z-10 bg-opacity-50 bg-black">
+          <div className="user-orders-popup bg-white p-4 shadow-md rounded-lg">
+            <h2 className="text-2xl font-bold mb-4">User Orders</h2>
+            <table className="w-full">
+              <thead>
+                <tr className="bg-gray-200">
+                  <th>Month</th>
+                  <th>Order Date</th>
+                  <th>Order No</th>
+                  <th>POC</th>
+                  <th>Existing / New Client</th>
+                  <th>Order Type</th>
+                  <th>Client Name</th>
+                  <th>Country / Region</th>
+                  <th>Contact Number</th>
+                  <th>Currency of Payment</th>
+                  <th>Quotation</th>
+                  <th>Total Amount Paid</th>
+                  <th>Shipping Costs</th>
+                  <th>Total Amount</th>
+                  <th>Payment Sender Name</th>
+                  <th>Mode of Payment</th>
+                  <th>Shipping Address</th>
+                  <th>Shipping Service</th>
+                </tr>
+              </thead>
+              <tbody>
+                {userOrdersData.map((order, index) => (
+                  <tr key={index}>
+                    <td>{order.month}</td>
+                    <td>{order.orderDate}</td>
+                    <td>{order.orderNo}</td>
+                    <td>{order.POC}</td>
+                    <td>{order.oldNewClient}</td>
+                    <td>{order.orderType}</td>
+                    <td>{order.clientName}</td>
+                    <td>{order.countryRegion}</td>
+                    <td>{order.contactNumber}</td>
+                    <td>{order.currencyOfPayment}</td>
+                    <td>{order.quotation}</td>
+                    <td>{order.totalAmountPaid}</td>
+                    <td>{order.shippingCosts}</td>
+                    <td>{order.totalAmount}</td>
+                    <td>{order.paymentSenderName}</td>
+                    <td>{order.modeOfPayment}</td>
+                    <td>{order.shippingAddress}</td>
+                    <td>{order.shippingService}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+            <button
+              onClick={() => setUserOrdersPopupVisibility(false)}
+              className="bg-blue-500 hover:bg-blue-600 text-white font-semibold py-2 px-4 mt-4 rounded"
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      }
+
+      <p>
+        <a
+          href="/"
+          onClick={() => navigate('/')}
+          className="text-blue-500 hover:underline"
+        >
+          Back to Login
+        </a>
+      </p>
+    </div>
+  );
+}
+
+export default SalesPage;
+

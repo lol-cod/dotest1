@@ -1,0 +1,51 @@
+/* orderspage.css */
+
+.orders-page-container {
+  padding: 20px;
+}
+
+.filter-dropdown {
+  margin: 10px 0;
+}
+
+.selected-order-row {
+  background-color: #f0f0f0; /* Highlight color */
+}
+
+.selected-order-details {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #fff; /* Background color for order details */
+  border: 1px solid #ddd; /* Border for order details */
+  border-radius: 5px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Box shadow for order details */
+}
+
+/* Add any other custom styles as needed */
+.selected-order-row {
+  background-color: #90de6c; /* Highlight color */
+  font-weight: bold;
+}
+
+
+/* Add margin to create spacing */
+/* Add margin to create spacing */
+.filter-buttons {
+  margin-top: 10px; /* Adjust the value to control the spacing between search bar and buttons */
+}
+
+/* Add gap between buttons */
+.filter-buttons button {
+  margin-right: 10px;
+  margin-bottom: 10px; /* Adjust the value to control the gap between buttons */
+}
+
+
+.export-button{
+  position: relative; 
+top: -40px;
+left: 1200px;
+}
+/* Other styles can go here as needed */
+
+/* Other styles can go here as needed */

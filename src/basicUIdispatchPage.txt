@@ -1,0 +1,234 @@
+// DispatchPage.js
+
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
+import './dispatch.css';
+import { toast, ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
+function DispatchPage() {
+  const [confirmedOrders, setConfirmedOrders] = useState([]);
+  const [selectedOrder, setSelectedOrder] = useState(null);
+  const [trackingInfo, setTrackingInfo] = useState({ trackingNumber: '', dispatchedOn: '', trackingStatus: '' });
+    const [showDispatched, setShowDispatched] = useState(false);
+    const [searchQuery, setSearchQuery] = useState('');
+
+
+    const filterOrders = (query) => {
+      const lowerCaseQuery = query.toLowerCase(); // Convert the search query to lowercase
+    
+      if (lowerCaseQuery === '') {
+        return confirmedOrders; // Return all orders if the query is empty
+      }
+    
+      return confirmedOrders.filter((order) =>
+        order.orderNo.toLowerCase().includes(lowerCaseQuery)
+      );
+    };
+    
+
+    
+    const handleSearch = () => {
+      const dispatched = showDispatched;
+      fetchOrders(dispatched);
+    };
+    
+
+
+
+  const fetchOrders = (dispatched) => {
+    axios.get(dispatched ? '/api/dispatch/dispatched' : '/api/dispatch/orders')
+      .then((response) => {
+        setConfirmedOrders(response.data);
+      })
+      .catch((error) => {
+        console.error('Error fetching orders:', error);
+      });
+  };
+
+
+
+  useEffect(() => {
+    // Fetch initial list of orders (yet to be dispatched by default)
+    fetchOrders(false);
+  }, []);
+
+  const handleOrderSelect = (order) => {
+    setSelectedOrder(order);
+    setTrackingInfo({ trackingNumber: '', dispatchedOn: '', trackingStatus: '' });
+  };
+
+  const handleTrackingSubmit = () => {
+    const { orderDate, orderNo, quotation, POC, shippingAddress, timestamp } = selectedOrder;
+    const { trackingNumber, dispatchedOn, trackingStatus } = trackingInfo;
+
+    // Submit tracking information for the specific order to the backend
+    axios.post('/api/dispatch/insertDispatch', {
+      orderDate,
+      orderNo,
+      quotation,
+      POC,
+      shippingAddress,
+      timestamp,
+      trackingNumber,
+      dispatchedOn,
+      trackingStatus
+    })
+    .then((response) => {
+      // Handle the response if needed
+      console.log('Tracking info submitted successfully:', response.data);
+
+      // After submitting, re-fetch the confirmed orders to refresh the table
+      axios.get('/api/dispatch/orders')
+        .then((response) => {
+          setConfirmedOrders(response.data);
+        })
+        .catch((error) => {
+          console.error('Error fetching confirmed orders:', error);
+        });
+        toast.success('Form submitted successfully', {
+          autoClose: 3000,
+          position: toast.POSITION.TOP_RIGHT,
+        });
+    })
+    .catch((error) => {
+      console.error('Error submitting tracking information:', error);
+    });
+  };
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setTrackingInfo({ ...trackingInfo, [name]: value });
+  };
+
+  return (
+    <div className="dispatch-container">
+      <div className="button-container">
+        <button
+          onClick={() => {
+            setShowDispatched(false);
+            fetchOrders(false);
+          }}
+        >
+          Yet to be Dispatched
+        </button>
+        <button
+          onClick={() => {
+            setShowDispatched(true);
+            fetchOrders(true);
+          }}
+        >
+          Dispatched
+        </button>
+      </div>
+
+      <div className="search-bar">
+  <input
+    type="text"
+    placeholder="Search by Order No"
+    value={searchQuery}
+    onChange={(e) => setSearchQuery(e.target.value)}
+  />
+  
+</div>
+
+
+      <div className="order-table-container">
+        <h1>Dispatch Page</h1>
+        <table>
+          <thead>
+            <tr>
+              <th>Order Date</th>
+              <th>Order No</th>
+              <th>Quotation</th>
+              <th>POC</th>
+              <th>Shipping Address</th>
+              
+              <th>Select</th>
+            </tr>
+          </thead>
+          <tbody>
+          {filterOrders(searchQuery).map((order) => (
+              <tr
+                key={order.orderId}
+                className={selectedOrder === order ? 'selected-order' : ''} // Apply bold class to selected order
+                onClick={() => handleOrderSelect(order)}
+              >
+                <td>{order.orderDate}</td>
+                <td>{order.orderNo}</td>
+                <td>{order.quotation}</td>
+                <td>{order.POC} </td>
+                <td>{order.shippingAddress}</td>
+                
+                <td>
+                  <button onClick={() => handleOrderSelect(order)}>Select</button>
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+
+
+
+      <div className="selected-order-container">
+        {selectedOrder && (
+          <div>
+            <h2>Selected Order Details</h2>
+            <p>Order Date: {selectedOrder.orderDate}</p>
+            <p>Order No: {selectedOrder.orderNo}</p>
+            <p>Quotation: {selectedOrder.quotation}</p>
+            <p>POC: {selectedOrder.POC}</p>
+            <p>Shipping Address: {selectedOrder.shippingAddress}</p>
+            <p>Time Stamp: {selectedOrder.timestamp}</p>
+
+            <div className="tracking-info-container">
+        <h2>Enter Tracking Information</h2>
+        <div className="input-container">
+          <label>
+            Tracking Number:
+            <input
+              type="text"
+              name="trackingNumber"
+              value={trackingInfo.trackingNumber}
+              onChange={handleChange}
+            />
+          </label>
+        </div>
+
+        <div className="input-container">
+          <label>
+            Dispatched On:
+            <input
+              type="date"
+              name="dispatchedOn"
+              value={trackingInfo.dispatchedOn}
+              onChange={handleChange}
+            />
+          </label>
+        </div>
+
+        <div className="input-container">
+          <label>
+            Tracking Status:
+            <input
+              type="text"
+              name="trackingStatus"
+              value={trackingInfo.trackingStatus}
+              onChange={handleChange}
+            />
+          </label>
+        </div>
+      </div>
+      
+      <button onClick={handleTrackingSubmit}>Submit Tracking Info</button>
+          </div>
+        )}
+      </div>
+      <ToastContainer />
+    </div>
+  );
+}
+
+export default DispatchPage;

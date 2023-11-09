@@ -1,0 +1,39 @@
+/* Default styles for larger screens */
+@media (min-width: 768px) {
+  /* Put the styles for larger screens here */
+}
+
+/* Styles for smaller screens (e.g., mobile devices) */
+@media (max-width: 767px) {
+  .order-table-container {
+    overflow-x: auto; /* Enable horizontal scrolling for smaller screens */
+  }
+  .order-table-container table {
+    width: 100%; /* Make the table fill the container width */
+  }
+  .order-table-container th,
+  .order-table-container td {
+    white-space: nowrap; /* Prevent text from wrapping */
+  }
+}
+
+/* Add this CSS code to your stylesheets */
+.selected-order {
+  background-color: #e6f7ff; /* Background color for selected row */
+}
+
+/* Style the "Read More" button */
+.read-more-button {
+  margin-left: 5px;
+  color: #007bff; /* Link color */
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+/* Style the "Read Less" button */
+.read-less-button {
+  margin-left: 5px;
+  color: #007bff; /* Link color */
+  text-decoration: underline;
+  cursor: pointer;
+}

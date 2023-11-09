@@ -1,0 +1,45 @@
+.selected-order {
+  background-color: #adc9e6 !important;
+}
+
+/* styles.css (Create a new CSS file and import it into your component) */
+.dispatch-container {
+  padding: 20px;
+}
+
+.button-container {
+  display: flex;
+  justify-content: space-around;
+  margin-bottom: 20px;
+}
+
+.search-bar {
+  margin-bottom: 20px;
+}
+
+.order-table-container {
+  margin-bottom: 20px;
+}
+
+.selected-order-container {
+  padding: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 5px;
+  background-color: #f8f8f8;
+}
+
+.selected-order-container h6 {
+  margin-top: 10px;
+}
+
+.tracking-info-container {
+  margin-top: 20px;
+  margin-bottom: 20px;
+}
+
+/* Add additional styles as needed */
+
+
+
+
+

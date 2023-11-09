@@ -1,0 +1,9 @@
+/* Add this CSS to your stylesheet */
+.side-drawer {
+  width: 550px; /* Adjust the width as needed */
+  padding: 20px;
+}
+
+.side-drawer button {
+  margin-bottom: 10px;
+}
