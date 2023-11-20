@@ -152,7 +152,7 @@ function SalesPage() {
   useEffect(() => {
     // Define a function to fetch the orderNo, orderDate, and month
     const fetchOrderData = () => {
-      axios.get('/api/sales/nextOrderNo')
+      axios.get('http://139.59.28.88:3000/api/sales/nextOrderNo')
         .then((response) => {
           const { nextOrderNo, month, orderDate } = response.data;
           // Update only the specific fields in the formData object
