@@ -277,7 +277,7 @@ app.post('/api/finance/confirmPayment', (req, res) => {
     remarks,
   ];
   
-  const sqlUpdateSales = 'UPDATE sales SET paymentconfirmed = ?, modeOfPayment=?, totalAmount=?, totalAmountPaid=?, confirmedPayment=?, timestamp=?, paymentType=?, payeeName=?, actualAmountReceived=?, paymentReceivedOn=?, paymentShortage=?, inrAmountCreditedInBank=?, dateOfCredit=?, transactionCode=?, remarks=? WHERE orderNo = ? and POC = ?';
+  const sqlUpdateSales = 'UPDATE sales SET paymentconfirmed = ?, modeOfPayment=?, totalAmount=?, totalAmountPaid=?, confirmedPayment=?, timestamp=?, paymentType=?, payeeName=?, actualAmountReceived=?, paymentReceivedOn=?, paymentShortage=?, inrAmountCreditedInBank=?, dateOfCredit=?, transactionCode=?, remarks=? WHERE orderNo = ? and POC = ? and orderDate=?';
   const valuesUpdateSales = [confirmedPayment, 
     modeOfPayment,
     totalAmount,
@@ -294,7 +294,8 @@ app.post('/api/finance/confirmPayment', (req, res) => {
     transactionCode,
     remarks,
     orderNo, 
-    POC,];
+    POC,
+    orderDate,];
 
   db.query(sqlInsertFinance, valuesInsertFinance, (err, results) => {
     if (err) {
@@ -354,7 +355,7 @@ app.get('/api/orders', (req, res) => {
 
 // Fetch confirmed orders with paymentConfirmation set to 1
 app.get('/api/dispatch/orders', (req, res) => {
-  const sql = 'SELECT orderDate, orderNo, quotation, clientName, POC, shippingAddress, timestamp FROM finance where trackingNumber is NULL and confirmedPayment=1 ';
+  const sql = 'SELECT orderDate, orderNo, quotation, clientName, POC, shippingAddress, timestamp FROM sales where trackingNumber is NULL and confirmedPayment=1 ';
   console.log("sql query for not dispatched:", sql);
   db.query(sql, (err, results) => {
     if (err) {
@@ -368,7 +369,7 @@ app.get('/api/dispatch/orders', (req, res) => {
 });
 
 app.get('/api/dispatch/dispatched', (req, res) => {
-  const sql = 'SELECT orderDate, orderNo, quotation, clientName, POC, shippingAddress, timestamp, trackingStatus, dispatchedOn, trackingNumber FROM finance where trackingNumber is not NULL and confirmedPayment=1 ';
+  const sql = 'SELECT orderDate, orderNo, quotation, clientName, POC, shippingAddress, timestamp, trackingStatus, dispatchedOn, trackingNumber FROM sales where trackingNumber is not NULL and confirmedPayment=1 ';
   db.query(sql, (err, results) => {
     if (err) {
       
@@ -458,8 +459,8 @@ app.post('/api/dispatch/insertDispatch', (req, res) => {
       const updateFinanceSql = 'UPDATE finance SET trackingNumber=?, dispatchedOn=?, trackingStatus=? WHERE orderNo=? and POC=?';
       const updateFinanceValues = [trackingNumber, dispatchedOn, trackingStatus, orderNo, POC];
 
-      const updateSalesSql = 'UPDATE sales SET trackingNumber=?, dispatchedOn=?, trackingStatus=? WHERE orderNo=? and POC=?';
-      const updateSalesValues = [trackingNumber, dispatchedOn, trackingStatus, orderNo, POC];
+      const updateSalesSql = 'UPDATE sales SET trackingNumber=?, dispatchedOn=?, trackingStatus=? WHERE orderNo=? and POC=? and orderDate=?';
+      const updateSalesValues = [trackingNumber, dispatchedOn, trackingStatus, orderNo, POC, orderDate];
 
       db.query(updateSql, updateValues, (err, results) => {
         if (err) {
@@ -496,8 +497,8 @@ app.post('/api/dispatch/insertDispatch', (req, res) => {
       const updateFinanceSql = 'UPDATE finance SET trackingNumber=?, dispatchedOn=?, trackingStatus=? WHERE orderNo=? and POC=?';
       const updateFinanceValues = [trackingNumber, dispatchedOn, trackingStatus, orderNo, POC];
 
-      const updateSalesSql = 'UPDATE sales SET trackingNumber=?, dispatchedOn=?, trackingStatus=? WHERE orderNo=? and POC=?';
-      const updateSalesValues = [trackingNumber, dispatchedOn, trackingStatus, orderNo, POC];
+      const updateSalesSql = 'UPDATE sales SET trackingNumber=?, dispatchedOn=?, trackingStatus=? WHERE orderNo=? and POC=? and orderDate=?';
+      const updateSalesValues = [trackingNumber, dispatchedOn, trackingStatus, orderNo, POC, orderDate];
 
       db.query(insertSql, insertValues, (err, results) => {
         if (err) {

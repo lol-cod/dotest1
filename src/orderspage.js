@@ -142,7 +142,8 @@ function OrdersPage() {
 
   function prepareOrdersForExport(orders) {
     return orders.map((order) => ({
-     "Order No": order.orderNo, 
+     "Order No": order.orderNo,
+     "Date": order.orderDate, 
      "Quotation": order.quotation,
      "Client Name": order.clientName, 
      "POC":   order.POC, 

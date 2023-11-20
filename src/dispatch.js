@@ -58,6 +58,18 @@ function DispatchPage() {
   useEffect(() => {
     // Fetch initial list of orders (yet to be dispatched by default)
     fetchOrders(false);
+    const handleEscapeKey = (event) => {
+      if (event.key === 'Escape') {
+        setSelectedOrder(null);
+      }
+    };
+
+    document.addEventListener('keydown', handleEscapeKey);
+
+    return () => {
+      // Remove the event listener when the component unmounts to prevent memory leaks
+      document.removeEventListener('keydown', handleEscapeKey);
+    };
   }, []);
 
   const handleOrderSelect = (order) => {
